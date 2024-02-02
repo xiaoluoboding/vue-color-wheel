@@ -1,0 +1,49 @@
+{
+  "name": "vue-library-starter",
+  "description": "A minimal Vue library starter, built on top of Vite & Vue 3",
+  "version": "0.0.1",
+  "type": "module",
+  "author": "xiaoluoboding <xiaoluoboding@gmail.com>",
+  "scripts": {
+    "dev": "vite",
+    "build:docs": "vite build --mode docs",
+    "build:lib": "vue-tsc --noEmit && vite build --mode lib",
+    "preview": "vite preview",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xiaoluoboding/vue-library-starter.git"
+  },
+  "homepage": "https://github.com/xiaoluoboding/vue-library-starter",
+  "files": [
+    "lib"
+  ],
+  "main": "./lib/vue-library-starter.umd.cjs",
+  "module": "./lib/vue-library-starter.js",
+  "exports": {
+    ".": {
+      "import": "./lib/vue-library-starter.js",
+      "require": "./lib/vue-library-starter.umd.cjs",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "types": "./lib/index.d.ts",
+  "devDependencies": {
+    "@iconify/json": "^2.2.177",
+    "@types/node": "^18.19.14",
+    "@unocss/reset": "^0.55.7",
+    "@vitejs/plugin-vue": "^4.6.2",
+    "@vueuse/core": "^10.7.2",
+    "clean-css": "^5.3.3",
+    "highlight.js": "^11.9.0",
+    "sass": "^1.70.0",
+    "typescript": "^4.9.5",
+    "unocss": "^0.55.7",
+    "unplugin-icons": "^0.16.6",
+    "unplugin-vue-components": "^0.25.2",
+    "vite": "^4.5.2",
+    "vue": "^3.4.15",
+    "vue-tsc": "^1.8.27"
+  }
+}
