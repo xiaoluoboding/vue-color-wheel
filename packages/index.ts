@@ -1,1 +1,3 @@
-export { default as MyComponent } from './MyComponent.vue'
+export { default as VueColorWheel } from './ColorWheel.vue'
+export * from './utils'
+export * from './types'

@@ -1,7 +1,22 @@
-import { defineConfig, presetUno, presetAttributify } from 'unocss'
+import {
+  defineConfig,
+  presetUno,
+  presetAttributify,
+  presetWebFonts
+} from 'unocss'
 
 export default defineConfig({
-  presets: [presetUno(), presetAttributify()],
+  presets: [
+    presetUno(),
+    presetAttributify(),
+    presetWebFonts({
+      fonts: {
+        // sans: 'Comfortaa',
+        // serif: 'Belanosima',
+        mono: 'Space Mono'
+      }
+    })
+  ],
   shortcuts: [
     {
       'flex-center': 'flex justify-center items-center',

@@ -35,8 +35,8 @@ export default defineConfig(({ command, mode }) => {
     userConfig.build = {
       lib: {
         entry: resolve(__dirname, 'packages/index.ts'),
-        name: 'VueLibraryStarter',
-        fileName: 'vue-library-starter'
+        name: 'VueColorWheel',
+        fileName: 'vue-color-wheel'
       },
       outDir: 'lib',
       emptyOutDir: true,
@@ -47,11 +47,11 @@ export default defineConfig(({ command, mode }) => {
         output: [
           {
             format: 'cjs',
-            entryFileNames: `vue-library-starter.cjs`
+            entryFileNames: `vue-color-wheel.cjs`
           },
           {
             format: 'es',
-            entryFileNames: `vue-library-starter.js`,
+            entryFileNames: `vue-color-wheel.js`,
             preserveModules: false
           }
         ]
