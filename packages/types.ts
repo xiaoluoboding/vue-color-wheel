@@ -11,7 +11,7 @@ export type ColorWheelProps = {
   harmony: HarmonyType
   wheel: WheelType
   color?: string
-  defaultColor?: HarmonyColor
+  defaultColor?: string
 }
 
 export type Harmony = {

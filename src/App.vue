@@ -7,18 +7,18 @@
   >
     <div class="container mx-auto max-w-5xl relative">
       <nav class="h-20 py-4 flex-between text-primary">
-        <div class="font-semibold text-xl flex-center gap-2">
+        <div class="font-semibold text-xl font-serif flex-center gap-2">
           <Logo class="h-6 w-6" />
           Vue Color Wheel
         </div>
         <div class="flex-center gap-4">
-          <button
+          <!-- <button
             class="!bg-transparent opacity-50 hover:opacity-100 transition"
             @click="(e) => toggleDarkmode()"
           >
             <carbon:moon class="w-6 h-6" v-if="isDark" />
             <carbon:sun class="w-6 h-6" v-else />
-          </button>
+          </button> -->
           <a
             class="opacity-50 hover:opacity-100 transition"
             href="https://github.com/xiaoluoboding/vue-color-wheel"
@@ -29,14 +29,14 @@
       </nav>
       <header class="py-16 flex flex-col gap-4">
         <div class="font-extrabold space-y-4">
-          <span class="text-6xl text-primary">Vue Color Wheel</span>
-          <div class="text-5xl text-primary">
+          <span class="text-6xl text-primary font-serif">Vue Color Wheel</span>
+          <div class="text-4xl text-primary font-sans">
             Create a color palette and effortlessly incorporate it into your
             projects.
           </div>
         </div>
         <div
-          class="text-2xl font-semibold text-slate-700 py-4 dark:text-slate-200"
+          class="text-2xl font-500 text-neutral-800 py-4 dark:text-neutral-200 font-sans"
         >
           A Color Wheel Picker for Vue
         </div>
@@ -59,7 +59,7 @@
       </header>
 
       <main
-        class="grid grid-cols-4 gap-8 text-xs 2xl:text-sm bg-white rounded-lg shadow-md"
+        class="grid grid-cols-4 gap-8 text-xs 2xl:text-sm bg-white rounded-2xl shadow-md"
       >
         <div class="w-full flex items-center p-8">
           <div class="flex flex-col gap-8">
@@ -74,7 +74,7 @@
                   />
                   <div
                     :style="{ backgroundColor: wheelColor }"
-                    class="absolute top-3 right-2 w-4 h-4 rounded-full"
+                    class="absolute top-3 right-2 w-4.5 h-4.5 rounded-full"
                   ></div>
                 </div>
               </figure>
@@ -107,7 +107,7 @@
             wheel="aurora"
             :harmony="currentType"
             :radius="160"
-            :defaultColor="hsvColor"
+            :defaultColor="wheelColor"
             v-model:color="wheelColor"
             @change="handleChangeColors"
           />
@@ -128,45 +128,45 @@
 
       <footer
         class="mt-16 w-full flex-center text-primary"
-        text="slate-900 dark:slate-300 opacity-60 sm"
+        text="neutral-900 dark:neutral-300 opacity-60 sm"
       >
         <div class="copyright flex flex-col justify-center items-center">
           <p>
             Code with ❤ & ☕️ by
-            <a class="text-neon" href="https://github.com/xiaoluoboding">
+            <a class="text-primary" href="https://github.com/xiaoluoboding">
               @xiaoluoboding
             </a>
             <span> © {{ new Date().getFullYear() }}</span>
           </p>
           <p class="flex items-center space-x-1">
-            <carbon:logo-twitter class="text-emerald-500" />
+            <carbon:logo-twitter class="text-primary" />
             <span>
               <a
                 href="https://twitter.com/xiaoluoboding"
-                class="text-neon"
+                class="text-primary"
                 target="_blank"
               >
                 Follow me on Twitter
               </a>
             </span>
             <span class="px-2 text-emerald-300">|</span>
-            <carbon:cafe class="text-emerald-500" />
+            <carbon:cafe class="text-primary" />
             <span>
               <a
                 href="https://www.buymeacoffee.com/xlbd"
                 target="_blank"
-                class="text-neon"
+                class="text-primary"
               >
                 Buy me a coffee
               </a>
             </span>
             <span class="px-2 text-emerald-300">|</span>
-            <mdi:heart class="text-emerald-500" />
+            <mdi:heart class="text-primary" />
             <span>
               <a
                 href="https://github.com/sponsors/xiaoluoboding"
                 target="_blank"
-                class="text-neon"
+                class="text-primary"
               >
                 Sponsor me on GitHub
               </a>
@@ -185,7 +185,7 @@ import { computed, ref } from 'vue'
 import { useDebounce } from '@vueuse/core'
 import { colord } from 'colord'
 
-import { VueColorWheel, HarmonyType, Harmony, hsv2rgb } from '@/index'
+import { VueColorWheel, HarmonyType, Harmony } from '@/index'
 import { isDark, toggleDarkmode } from '~/composables/useDarkmode'
 
 const wheelColor = useDebounce(ref('#ff5252')) // { hue: 0, saturation: 0.68, value: 1 }
@@ -193,34 +193,19 @@ const colors = ref<Harmony[]>([])
 const currentType = ref<HarmonyType>('analogous')
 
 const harmonyTypes: { type: HarmonyType; label: string }[] = [
-  { type: 'analogous', label: 'Analogous' },
+  { type: 'monochromatic', label: 'Monochromatic' },
   { type: 'complementary', label: 'Complementary' },
-  { type: 'compound', label: 'Compound' },
+  { type: 'analogous', label: 'Analogous' },
+  { type: 'triad', label: 'Triad' },
   { type: 'split', label: 'Split' },
-  { type: 'square', label: 'Square' },
+  { type: 'compound', label: 'Compound' },
   { type: 'tetradic', label: 'Tetradic' },
-  { type: 'triad', label: 'Triad' }
+  { type: 'square', label: 'Square' },
+  { type: 'doubleSplit', label: 'Double Split' }
 ]
 
 const colorList = computed(() => {
-  return colors.value.map((item) => item.rgb)
-})
-
-const hsvColor = computed(() => {
-  const hsv = colord(wheelColor.value).toHsv()
-  const hsvColor = {
-    hue: hsv.h,
-    saturation: hsv.s / 100,
-    value: hsv.v / 100
-  }
-  // return {
-  //   hexColor: wheelColor.value,
-  //   rgbColor: colord(wheelColor.value).toRgbString(),
-  //   hsvColor,
-  //   hsv,
-  //   rgb: hsv2rgb(hsvColor.hue, hsvColor.saturation, hsvColor.value)
-  // }
-  return hsvColor
+  return colors.value.map((item) => colord(item.rgb).toHex())
 })
 
 const bgColor = computed(() => {

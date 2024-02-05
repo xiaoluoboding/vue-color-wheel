@@ -11,8 +11,8 @@ export default defineConfig({
     presetAttributify(),
     presetWebFonts({
       fonts: {
-        // sans: 'Comfortaa',
-        // serif: 'Belanosima',
+        sans: 'Plus Jakarta Sans',
+        serif: 'Belanosima',
         mono: 'Space Mono'
       }
     })

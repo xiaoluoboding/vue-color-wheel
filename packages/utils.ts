@@ -1,15 +1,16 @@
 // import { colord } from 'colord'
 
 export const harmonies = {
+  complementary: [180],
   analogous: [-30, 30],
   split: [-150, 150],
-  complementary: [180],
   triad: [120, 240],
   tetradic: [60, 180, 240],
   square: [90, 180, 270],
+  compound: [30, 150, 180],
   // doubleAnalogous: [-60, -30, 30, 60]
-  // monochromatic: [?, ?],
-  compound: [30, 150, 180]
+  monochromatic: [360, 720],
+  doubleSplit: [-150, -30, 30, 150]
 } as const
 
 export const xy2polar = (x: number, y: number): [number, number] => {

@@ -22,7 +22,7 @@
         height: `${radius * 2}px`
       }"
     ></div>
-    <template v-for="(harmony, i) in harmonyPairs" :key="i">
+    <template v-for="(h, i) in harmonyPairs" :key="i">
       <div
         :style="{
           display: 'flex',
@@ -35,9 +35,9 @@
           width: '16px',
           height: '16px',
           borderRadius: '999px',
-          border: '2px solid rgba(255, 255, 255, 1)',
-          backgroundColor: `rgb(${harmony.rgb})`,
-          transform: `translate(${harmony.x}px, ${harmony.y}px)`,
+          border: '3px solid rgba(255, 255, 255, 1)',
+          backgroundColor: `rgb(${h.rgb})`,
+          transform: `translate(${h.x}px, ${h.y}px)`,
           boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.05)'
         }"
       />
@@ -57,7 +57,7 @@
         width: '24px',
         height: '24px',
         borderRadius: '99px',
-        border: '4px solid rgba(255, 255, 255, 1)',
+        border: '5px solid rgba(255, 255, 255, 1)',
         backgroundColor: `${rgb}`,
         transform: `translate(${position.x}px, ${position.y}px)`,
         boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.05)',
@@ -69,9 +69,11 @@
 </template>
 
 <script lang="ts" setup>
-import { colord } from 'colord'
-import { ref, computed, watch, toRefs, onMounted } from 'vue'
+import { ref, computed, toRefs, onMounted } from 'vue'
+import { colord, extend } from 'colord'
 import Moveable from 'moveable'
+import mixPlugin from 'colord/plugins/mix'
+import { watchDebounced } from '@vueuse/core'
 
 import {
   harmonies,
@@ -82,7 +84,9 @@ import {
   xy2polar,
   xy2rgb
 } from './utils'
-import { ColorWheelProps, Harmony } from './types'
+import { ColorWheelProps, Harmony, HarmonyColor } from './types'
+
+extend([mixPlugin])
 
 defineOptions({
   name: 'VueColorWheel',
@@ -98,8 +102,9 @@ const props = withDefaults(defineProps<ColorWheelProps>(), {
   radius: 120,
   harmony: 'analogous',
   wheel: 'spectrum',
-  color: () => '#ff3333',
-  defaultColor: () => ({ hue: 0, saturation: 0.8, value: 1.0 })
+  color: () => '#ff5252',
+  // defaultColor: () => ({ hue: 0, saturation: 0.8, value: 1.0 })
+  defaultColor: () => '#ff5252'
 })
 
 const { defaultColor, radius, wheel } = toRefs(props)
@@ -107,18 +112,13 @@ const { defaultColor, radius, wheel } = toRefs(props)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const wrapperRef = ref<HTMLDivElement | null>(null)
 const handleRef = ref<HTMLDivElement | null>(null)
-const position = ref(
-  defaultColor.value
-    ? hsv2xy(
-        defaultColor.value.hue,
-        defaultColor.value.saturation,
-        defaultColor.value.value,
-        radius.value
-      )
-    : hsv2xy(0, 1, 1, radius.value)
-)
+const position = ref({
+  x: 0,
+  y: 0
+})
 
-const harmony = computed(() => harmonies[props.harmony])
+const harmonyPosition = computed(() => harmonies[props.harmony])
+const isMonochromatic = computed(() => props.harmony === 'monochromatic')
 const rgb = computed(() => {
   const {
     r: red,
@@ -147,7 +147,39 @@ const harmonyPairs = computed(() => {
     rgb: `rgb(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b})`
   }
 
-  const colors = harmony.value.map((harmonyHue) => {
+  const monochromaticColors = harmonyPosition.value.map((harmonyHue) => {
+    // let newHue = (hue + harmonyHue) % 360
+    // newHue = newHue < 0 ? 360 + newHue : newHue
+
+    // const [x, y] = polar2xy(r, newHue * (Math.PI / 180))
+
+    const rbgString =
+      harmonyHue === 360
+        ? colord(currentColor.rgb)
+            .tints(5)
+            .map((c) => c.toRgbString())[1]
+        : colord(currentColor.rgb)
+            .shades(5)
+            .map((c) => c.toRgbString())[1]
+    const hsvObj =
+      harmonyHue === 360
+        ? colord(currentColor.rgb)
+            .tints(5)
+            .map((c) => c.toHsv())[1]
+        : colord(currentColor.rgb)
+            .shades(5)
+            .map((c) => c.toHsv())[1]
+    return {
+      x: position.value.x,
+      y: position.value.y,
+      h: hsvObj?.h,
+      s: hsvObj?.s,
+      v: hsvObj?.v,
+      rgb: rbgString
+    }
+  })
+
+  const combinationColors = harmonyPosition.value.map((harmonyHue) => {
     let newHue = (hue + harmonyHue) % 360
     newHue = newHue < 0 ? 360 + newHue : newHue
 
@@ -164,7 +196,17 @@ const harmonyPairs = computed(() => {
     }
   })
 
-  emit('change', [currentColor, ...colors])
+  const colors = isMonochromatic.value ? monochromaticColors : combinationColors
+
+  if (isMonochromatic.value) {
+    emit('change', [
+      ...monochromaticColors.slice(0, 1),
+      currentColor,
+      ...monochromaticColors.slice(1)
+    ])
+  } else {
+    emit('change', [currentColor, ...combinationColors])
+  }
 
   return colors
 })
@@ -243,35 +285,35 @@ const makeHandleDraggable = () => {
       // Limit radial distance to radius
       r = Math.min(r, radius.value)
       const [x, y] = polar2xy(r, phi)
-      position.value = { x: x + radius.value, y: y + radius.value }
-      const { r: red, g: green, b: blue } = xy2rgb(x, y, radius.value)
-      const color = colord({
-        r: red,
-        g: green,
-        b: blue
-      }).toHex()
-      emit('update:color', color)
+      const pos = { x: x + radius.value, y: y + radius.value }
+      position.value = pos
+      const { r: red, g: green, b: blue } = xy2rgb(pos.x, pos.y, radius.value)
+      emit('update:color', colord({ r: red, g: green, b: blue }).toHex())
       // target!.style.transform = transform
     })
 }
 
-// watch(
-//   () => [defaultColor.value, radius.value],
-//   () => {
-//     if (defaultColor.value) {
-//       position.value = hsv2xy(
-//         defaultColor.value.hue,
-//         defaultColor.value.saturation,
-//         defaultColor.value.value,
-//         radius.value
-//       )
-//     }
-//   },
-//   {
-//     deep: true,
-//     immediate: true
-//   }
-// )
+watchDebounced(
+  () => [defaultColor.value, radius.value],
+  () => {
+    if (defaultColor.value) {
+      const hsvColor = colord(defaultColor.value).toHsv()
+      const hsv: HarmonyColor = {
+        hue: hsvColor.h,
+        saturation: hsvColor.s / 100,
+        value: hsvColor.v / 100
+      }
+      position.value = hsv2xy(hsv.hue, hsv.saturation, hsv.value, radius.value)
+    } else {
+      position.value = hsv2xy(0, 1, 1, radius.value)
+    }
+  },
+  {
+    deep: true,
+    immediate: true,
+    debounce: 200
+  }
+)
 
 onMounted(() => {
   drawWheel()
