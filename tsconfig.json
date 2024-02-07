@@ -16,7 +16,8 @@
     "paths": {
       "@/*": ["packages/*"],
       "~/*": ["./src/*"]
-    }
+    },
+    "allowJs": true
   },
   "include": [
     "src/**/*.ts",

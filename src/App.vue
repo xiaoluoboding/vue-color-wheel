@@ -1,10 +1,16 @@
 <template>
   <div
     class="w-full h-full min-h-screen bg-neutral-50 dark:bg-neutral-900"
+    id="app-wrapper"
     :style="{
-      background: bgColor
+      background: `${bgColor}`
     }"
   >
+    <canvas
+      class="fixed z-0 w-full h-full"
+      data-transition-in
+      id="gradient-canvas"
+    />
     <div class="container mx-auto max-w-5xl relative">
       <nav class="h-20 py-4 flex-between text-primary">
         <div class="font-semibold text-xl font-serif flex-center gap-2">
@@ -127,7 +133,7 @@
       </main>
 
       <footer
-        class="mt-16 w-full flex-center text-primary"
+        class="py-16 w-full flex-center text-primary"
         text="neutral-900 dark:neutral-300 opacity-60 sm"
       >
         <div class="copyright flex flex-col justify-center items-center">
@@ -181,14 +187,18 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useDebounce } from '@vueuse/core'
 import { colord } from 'colord'
+import { gsap } from 'gsap'
+import { Gradient } from './plugins/GradientMesh.js'
+import { VueColorWheel } from '@/index'
+import type { HarmonyType, Harmony } from '@/index'
+// import { isDark, toggleDarkmode } from '~/composables/useDarkmode'
 
-import { VueColorWheel, HarmonyType, Harmony } from '@/index'
-import { isDark, toggleDarkmode } from '~/composables/useDarkmode'
+const gradient = computed(() => new Gradient())
 
-const wheelColor = useDebounce(ref('#ff5252')) // { hue: 0, saturation: 0.68, value: 1 }
+const wheelColor = useDebounce(ref('#40ffff')) // { hue: 0, saturation: 0.68, value: 1 }
 const colors = ref<Harmony[]>([])
 const currentType = ref<HarmonyType>('analogous')
 
@@ -212,10 +222,40 @@ const bgColor = computed(() => {
   return `linear-gradient(${colorList.value.join(',')})`
 })
 
+const handleChangeGradient = (harmonyColors: Harmony[]) => {
+  const newColors = harmonyColors.map((color, i) => colord(color.rgb).toHex())
+
+  const [base, ...waves] = newColors
+
+  if (gradient.value) {
+    const root = document.documentElement
+    root.style.setProperty('--gradient-color-1', base)
+    root.style.setProperty('--gradient-color-4', base)
+
+    for (const [index, wave] of Object.entries(waves)) {
+      root.style.setProperty(`--gradient-color-${Number(index) + 2}`, wave)
+    }
+
+    /* @ts-ignore */
+    gradient.value.disconnect()
+    /* @ts-ignore */
+    gradient.value.initGradient('#gradient-canvas')
+  }
+}
+
 const handleChangeColors = (harmonyColors: Harmony[]) => {
-  // console.log(colors)
   colors.value = harmonyColors
 }
+
+watch(
+  () => colors.value,
+  (newColors) => {
+    handleChangeGradient(newColors)
+  },
+  {
+    immediate: true
+  }
+)
 </script>
 
 <style lang="scss">
