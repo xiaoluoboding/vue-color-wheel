@@ -24,8 +24,9 @@
     />
     <div
       class="wheel-ring-tracker"
-      style="position: absolute; border-radius: 100%"
       :style="{
+        position: 'absolute',
+        borderRadius: '100%',
         width: `${radius * 2 + 48}px`,
         height: `${radius * 2 + 48}px`,
         top: '-24px',
@@ -38,12 +39,15 @@
       <div
         id="ringTrackerRef"
         class="wheel-ring-inner"
-        style="position: relative; border-radius: 100%; background: transparent"
         :style="{
+          position: 'relative',
+          borderRadius: '100%',
+          background: 'transparent',
           width: `${radius * 2 + 48}px`,
           height: `${radius * 2 + 48}px`,
           top: '0',
-          left: '0'
+          left: '0',
+          cursor: 'pointer'
         }"
       >
         <div
