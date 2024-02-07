@@ -10,6 +10,19 @@
     }"
   >
     <div
+      class="wheel-ring-mask"
+      :style="{
+        position: 'absolute',
+        borderRadius: '100%',
+        background: '#ffffff',
+        width: `${radius * 2 + 24}px`,
+        height: `${radius * 2 + 24}px`,
+        top: '-12px',
+        left: '-12px',
+        zIndex: '1'
+      }"
+    />
+    <div
       class="wheel-ring-tracker"
       style="position: absolute; border-radius: 100%"
       :style="{
@@ -17,20 +30,19 @@
         height: `${radius * 2 + 48}px`,
         top: '-24px',
         left: '-24px',
-        background: `${ringLinearGradient}`,
-        transform: `rotate(90deg)`
+        background: `${ringLinearGradient}`
       }"
       role="slider"
     >
       <div
         id="ringTrackerRef"
         class="wheel-ring-inner"
-        style="position: relative; border-radius: 100%; background: #ffffff"
+        style="position: relative; border-radius: 100%; background: transparent"
         :style="{
-          width: `${radius * 2 + 24}px`,
-          height: `${radius * 2 + 24}px`,
-          top: '12px',
-          left: '12px'
+          width: `${radius * 2 + 48}px`,
+          height: `${radius * 2 + 48}px`,
+          top: '0',
+          left: '0'
         }"
       >
         <div
@@ -42,16 +54,17 @@
             alignItems: 'center',
             position: 'absolute',
             left: '50%',
-            bottom: `-13px`,
+            bottom: '-2px',
             width: '14px',
             height: '14px',
             borderRadius: '99px',
-            border: '1px solid #ffffff',
+            border: '1px solid rgba(0, 0, 0, 0.24)',
             backgroundColor: `#ffffff`,
-            boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.3)',
+            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.08)',
             cursor: 'move',
             userSelect: 'none',
-            transform: 'translateX(-50%)'
+            transform: 'translateX(-50%)',
+            zIndex: '10'
           }"
         />
       </div>
@@ -60,7 +73,12 @@
     <canvas
       ref="canvasRef"
       v-if="wheel === 'spectrum'"
-      :style="{ width: '100%', height: '100%', borderRadius: '9999px' }"
+      :style="{
+        width: '100%',
+        height: '100%',
+        borderRadius: '9999px',
+        zIndex: '10'
+      }"
     />
 
     <div
@@ -68,7 +86,8 @@
       class="aurora-wheel"
       :style="{
         width: `${radius * 2}px`,
-        height: `${radius * 2}px`
+        height: `${radius * 2}px`,
+        zIndex: '10'
       }"
     ></div>
 
@@ -88,7 +107,8 @@
           border: '3px solid #ffffff',
           backgroundColor: `rgb(${h.rgb})`,
           transform: `translate(${h.x}px, ${h.y}px)`,
-          boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.05)'
+          boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.05)',
+          zIndex: '10'
         }"
       />
     </template>
@@ -112,7 +132,8 @@
         transform: `translate(${position.x}px, ${position.y}px)`,
         boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.05)',
         cursor: 'move',
-        userSelect: 'none'
+        userSelect: 'none',
+        zIndex: '10'
       }"
     />
   </div>
@@ -365,11 +386,11 @@ const makeHandleDraggable = () => {
 }
 
 const makeRingHandleDraggble = () => {
-  const rotationOffset = 90
+  const rotationOffset = -90
   const RAD2DEG = 180 / Math.PI
   gsap.set('#ringTrackerRef', { transformOrigin: 'center center' })
   const draggable = Draggable.create('#ringTrackerRef', {
-    trigger: '#ringHandleRef',
+    // trigger: '#ringHandleRef',
     type: 'rotation',
     // bounds: { minRotation: 0, maxRotation: 270 },
     // liveSnap: {
@@ -378,25 +399,33 @@ const makeRingHandleDraggble = () => {
     //     return Math.round(value / 10) * 10
     //   }
     // },
-    // onPressInit: function (e) {
-    //   if (!this.rotationOrigin) {
-    //     return
-    //   }
-    //   //figure out the angle from the pointer to the rotational origin (in degrees)
-    //   let rotation =
-    //     Math.atan2(
-    //       this.pointerY - this.rotationOrigin.y,
-    //       this.pointerX - this.rotationOrigin.x
-    //     ) *
-    //       RAD2DEG +
-    //     rotationOffset
-    //   if (rotation < 0) {
-    //     rotation += 360
-    //   } else if (rotation > 270) {
-    //     rotation -= 360
-    //   }
-    //   gsap.set(this.target, { rotation })
-    // },
+    onPressInit: function () {
+      if (!this.rotationOrigin) {
+        return
+      }
+      //figure out the angle from the pointer to the rotational origin (in degrees)
+      let rotation =
+        Math.atan2(
+          this.pointerY - this.rotationOrigin.y,
+          this.pointerX - this.rotationOrigin.x
+        ) *
+          RAD2DEG +
+        rotationOffset
+      if (rotation < 0) {
+        rotation += 360
+      } else if (rotation > 270) {
+        rotation -= 360
+      }
+      if (rotation) {
+        // console.log(this.rotation)
+        const angle = Math.abs(rotation) % 360
+        console.log(angle.toFixed(1))
+        const value = Math.abs(180 - angle) / 180
+        brightness.value = value
+        // emit('update:color', colord(rgb.value).toHex())
+      }
+      gsap.set(this.target, { rotation })
+    },
     onDrag: function () {
       if (this.rotation) {
         // console.log(this.rotation)
