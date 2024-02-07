@@ -30,6 +30,7 @@
         height: `${radius * 2 + 48}px`,
         top: '-24px',
         left: '-24px',
+        transform: `rotate(90deg)`,
         background: `${ringLinearGradient}`
       }"
       role="slider"
@@ -386,7 +387,7 @@ const makeHandleDraggable = () => {
 }
 
 const makeRingHandleDraggble = () => {
-  const rotationOffset = -90
+  const rotationOffset = -180
   const RAD2DEG = 180 / Math.PI
   gsap.set('#ringTrackerRef', { transformOrigin: 'center center' })
   const draggable = Draggable.create('#ringTrackerRef', {
@@ -419,7 +420,6 @@ const makeRingHandleDraggble = () => {
       if (rotation) {
         // console.log(this.rotation)
         const angle = Math.abs(rotation) % 360
-        console.log(angle.toFixed(1))
         const value = Math.abs(180 - angle) / 180
         brightness.value = value
         // emit('update:color', colord(rgb.value).toHex())
@@ -430,7 +430,6 @@ const makeRingHandleDraggble = () => {
       if (this.rotation) {
         // console.log(this.rotation)
         const angle = Math.abs(this.rotation) % 360
-        console.log(angle.toFixed(1))
         const value = Math.abs(180 - angle) / 180
         brightness.value = value
         // emit('update:color', colord(rgb.value).toHex())
