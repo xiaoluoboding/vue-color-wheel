@@ -1,4 +1,4 @@
-// import { colord } from 'colord'
+import { colord } from 'colord'
 
 export const harmonies = {
   complementary: [180],
@@ -66,28 +66,33 @@ export const hsv2rgb = (
   let [r, g, b] = [r1 + m, g1 + m, b1 + m]
 
   // Change r,g,b values from [0,1] to [0,255]
-  return {
-    r: Math.round(r * 255),
-    g: Math.round(g * 255),
-    b: Math.round(b * 255)
-  }
   // return {
-  //   r: r * 255,
-  //   g: g * 255,
-  //   b: b * 255
+  //   r: Math.round(r * 255),
+  //   g: Math.round(g * 255),
+  //   b: Math.round(b * 255)
   // }
+  return {
+    r: r * 255,
+    g: g * 255,
+    b: b * 255
+  }
 }
 
-// export const hex2hsv = (hexColor: string) => {
-//   const { h, s, v } = colord(hexColor).toHsv()
-//   return {
-//     hue: h,
-//     saturation: s / 100,
-//     value: v / 100
-//   }
-// }
+export const hex2hsv = (color: string) => {
+  const { h, s, v } = colord(color).toHsv()
+  return {
+    hue: h,
+    saturation: s / 100,
+    value: v / 100
+  }
+}
 
-export const xy2rgb = (x: number, y: number, radius: number) => {
+export const xy2rgb = (
+  x: number,
+  y: number,
+  radius: number,
+  brightness = 1
+) => {
   x -= radius
   y -= radius
 
@@ -95,7 +100,7 @@ export const xy2rgb = (x: number, y: number, radius: number) => {
 
   const hue = rad2deg(phi)
   const saturation = r / radius
-  const value = 1.0
+  const value = brightness
 
   return hsv2rgb(hue, saturation, value)
 }

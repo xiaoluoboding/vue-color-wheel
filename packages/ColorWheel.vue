@@ -9,11 +9,60 @@
       height: `${radius * 2}px`
     }"
   >
+    <div
+      class="wheel-ring-tracker"
+      style="position: absolute; border-radius: 100%"
+      :style="{
+        width: `${radius * 2 + 48}px`,
+        height: `${radius * 2 + 48}px`,
+        top: '-24px',
+        left: '-24px',
+        background: `${ringLinearGradient}`,
+        transform: `rotate(90deg)`
+      }"
+      role="slider"
+    >
+      <div
+        id="ringTrackerRef"
+        class="wheel-ring-inner"
+        style="position: relative; border-radius: 100%; background: #ffffff"
+        :style="{
+          width: `${radius * 2 + 24}px`,
+          height: `${radius * 2 + 24}px`,
+          top: '12px',
+          left: '12px'
+        }"
+      >
+        <div
+          id="ringHandleRef"
+          :style="{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'absolute',
+            left: '50%',
+            bottom: `-13px`,
+            width: '14px',
+            height: '14px',
+            borderRadius: '99px',
+            border: '1px solid #ffffff',
+            backgroundColor: `#ffffff`,
+            boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.3)',
+            cursor: 'move',
+            userSelect: 'none',
+            transform: 'translateX(-50%)'
+          }"
+        />
+      </div>
+    </div>
+
     <canvas
       ref="canvasRef"
       v-if="wheel === 'spectrum'"
       :style="{ width: '100%', height: '100%', borderRadius: '9999px' }"
     />
+
     <div
       v-else
       class="aurora-wheel"
@@ -22,6 +71,7 @@
         height: `${radius * 2}px`
       }"
     ></div>
+
     <template v-for="(h, i) in harmonyPairs" :key="i">
       <div
         :style="{
@@ -35,7 +85,7 @@
           width: '16px',
           height: '16px',
           borderRadius: '999px',
-          border: '3px solid rgba(255, 255, 255, 1)',
+          border: '3px solid #ffffff',
           backgroundColor: `rgb(${h.rgb})`,
           transform: `translate(${h.x}px, ${h.y}px)`,
           boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.05)'
@@ -57,7 +107,7 @@
         width: '24px',
         height: '24px',
         borderRadius: '99px',
-        border: '5px solid rgba(255, 255, 255, 1)',
+        border: '5px solid #ffffff',
         backgroundColor: `${rgb}`,
         transform: `translate(${position.x}px, ${position.y}px)`,
         boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.05)',
@@ -74,9 +124,12 @@ import { colord, extend } from 'colord'
 import Moveable from 'moveable'
 import mixPlugin from 'colord/plugins/mix'
 import { watchDebounced } from '@vueuse/core'
+import { gsap } from 'gsap'
+import { Draggable } from 'gsap/Draggable'
 
 import {
   harmonies,
+  hex2hsv,
   hsv2rgb,
   hsv2xy,
   polar2xy,
@@ -84,9 +137,10 @@ import {
   xy2polar,
   xy2rgb
 } from './utils'
-import { ColorWheelProps, Harmony, HarmonyColor } from './types'
+import { ColorWheelProps, Harmony } from './types'
 
 extend([mixPlugin])
+gsap.registerPlugin(Draggable)
 
 defineOptions({
   name: 'VueColorWheel',
@@ -102,19 +156,29 @@ const props = withDefaults(defineProps<ColorWheelProps>(), {
   radius: 120,
   harmony: 'analogous',
   wheel: 'spectrum',
-  color: () => '#ff5252',
-  // defaultColor: () => ({ hue: 0, saturation: 0.8, value: 1.0 })
-  defaultColor: () => '#ff5252'
+  color: '#33ffee',
+  defaultColor: '#33ffee'
 })
 
 const { defaultColor, radius, wheel } = toRefs(props)
 
+const defaultHsv = hex2hsv(defaultColor.value)
+
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const wrapperRef = ref<HTMLDivElement | null>(null)
 const handleRef = ref<HTMLDivElement | null>(null)
-const position = ref({
-  x: 0,
-  y: 0
+const position = ref(
+  hsv2xy(defaultHsv.hue, defaultHsv.saturation, defaultHsv.value, radius.value)
+)
+const brightness = ref(1)
+const ringLinearGradient = computed(() => {
+  const tintColorList = colord(defaultColor.value)
+    .tints(11)
+    .map((c) => c.toRgbString())
+  return `linear-gradient(rgb(0, 0, 0), ${tintColorList.slice(
+    0,
+    1
+  )}, ${tintColorList.slice(9, 10)})`
 })
 
 const harmonyPosition = computed(() => harmonies[props.harmony])
@@ -127,6 +191,14 @@ const rgb = computed(() => {
   } = xy2rgb(position.value.x, position.value.y, radius.value)
   return `rgb(${red}, ${green}, ${blue})`
 })
+const rgba = computed(() => {
+  const {
+    r: red,
+    g: green,
+    b: blue
+  } = xy2rgb(position.value.x, position.value.y, radius.value, brightness.value)
+  return `rgb(${red}, ${green}, ${blue})`
+})
 
 const harmonyPairs = computed(() => {
   const x = position.value.x - radius.value
@@ -136,7 +208,7 @@ const harmonyPairs = computed(() => {
 
   const hue = rad2deg(phi)
   const saturation = r / radius.value
-  const value = 1
+  const value = brightness.value
   const rgbColor = hsv2rgb(hue, saturation, value)
   const currentColor = {
     x,
@@ -148,11 +220,6 @@ const harmonyPairs = computed(() => {
   }
 
   const monochromaticColors = harmonyPosition.value.map((harmonyHue) => {
-    // let newHue = (hue + harmonyHue) % 360
-    // newHue = newHue < 0 ? 360 + newHue : newHue
-
-    // const [x, y] = polar2xy(r, newHue * (Math.PI / 180))
-
     const rbgString =
       harmonyHue === 360
         ? colord(currentColor.rgb)
@@ -287,22 +354,69 @@ const makeHandleDraggable = () => {
       const [x, y] = polar2xy(r, phi)
       const pos = { x: x + radius.value, y: y + radius.value }
       position.value = pos
-      const { r: red, g: green, b: blue } = xy2rgb(pos.x, pos.y, radius.value)
+      const {
+        r: red,
+        g: green,
+        b: blue
+      } = xy2rgb(pos.x, pos.y, radius.value, brightness.value)
       emit('update:color', colord({ r: red, g: green, b: blue }).toHex())
       // target!.style.transform = transform
     })
+}
+
+const makeRingHandleDraggble = () => {
+  const rotationOffset = 90
+  const RAD2DEG = 180 / Math.PI
+  gsap.set('#ringTrackerRef', { transformOrigin: 'center center' })
+  const draggable = Draggable.create('#ringTrackerRef', {
+    trigger: '#ringHandleRef',
+    type: 'rotation',
+    // bounds: { minRotation: 0, maxRotation: 270 },
+    // liveSnap: {
+    //   rotation: function (value) {
+    //     //snap to the closest increment of 10.
+    //     return Math.round(value / 10) * 10
+    //   }
+    // },
+    // onPressInit: function (e) {
+    //   if (!this.rotationOrigin) {
+    //     return
+    //   }
+    //   //figure out the angle from the pointer to the rotational origin (in degrees)
+    //   let rotation =
+    //     Math.atan2(
+    //       this.pointerY - this.rotationOrigin.y,
+    //       this.pointerX - this.rotationOrigin.x
+    //     ) *
+    //       RAD2DEG +
+    //     rotationOffset
+    //   if (rotation < 0) {
+    //     rotation += 360
+    //   } else if (rotation > 270) {
+    //     rotation -= 360
+    //   }
+    //   gsap.set(this.target, { rotation })
+    // },
+    onDrag: function () {
+      if (this.rotation) {
+        // console.log(this.rotation)
+        const angle = Math.abs(this.rotation) % 360
+        console.log(angle.toFixed(1))
+        const value = Math.abs(180 - angle) / 180
+        brightness.value = value
+        // emit('update:color', colord(rgb.value).toHex())
+      }
+    }
+  })[0]
+
+  console.log(draggable)
 }
 
 watchDebounced(
   () => [defaultColor.value, radius.value],
   () => {
     if (defaultColor.value) {
-      const hsvColor = colord(defaultColor.value).toHsv()
-      const hsv: HarmonyColor = {
-        hue: hsvColor.h,
-        saturation: hsvColor.s / 100,
-        value: hsvColor.v / 100
-      }
+      const hsv = hex2hsv(defaultColor.value)
       position.value = hsv2xy(hsv.hue, hsv.saturation, hsv.value, radius.value)
     } else {
       position.value = hsv2xy(0, 1, 1, radius.value)
@@ -318,6 +432,7 @@ watchDebounced(
 onMounted(() => {
   drawWheel()
   makeHandleDraggable()
+  makeRingHandleDraggble()
 })
 </script>
 
