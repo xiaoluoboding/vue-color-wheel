@@ -10,6 +10,7 @@ export type ColorWheelProps = {
   radius: number
   harmony: HarmonyType
   wheel: WheelType
+  showBrightness: boolean
   color?: string
   defaultColor?: string
 }

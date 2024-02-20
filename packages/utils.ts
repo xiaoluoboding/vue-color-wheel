@@ -47,8 +47,9 @@ export const hsv2rgb = (hue: number, saturation: number, value: number) => {
     v: value * 100
   }
 
-  return colord(hsv).mix('#ffffff', value).toRgb()
-  // return colord(hsv).toRgb()
+  return value === 1
+    ? colord(hsv).toRgb()
+    : colord(hsv).mix('#ffffff', value).toRgb()
 }
 
 export const hex2hsv = (color: string) => {

@@ -23,6 +23,7 @@
       }"
     />
     <div
+      v-if="showBrightness"
       class="wheel-ring-tracker"
       :style="{
         position: 'absolute',
@@ -181,11 +182,12 @@ const props = withDefaults(defineProps<ColorWheelProps>(), {
   radius: 120,
   harmony: 'analogous',
   wheel: 'spectrum',
+  showBrightness: false,
   color: '#33ffee',
   defaultColor: '#33ffee'
 })
 
-const { defaultColor, radius, wheel } = toRefs(props)
+const { defaultColor, radius, wheel, showBrightness } = toRefs(props)
 
 const defaultHsv = hex2hsv(defaultColor.value)
 
@@ -208,6 +210,9 @@ const ringLinearGradient = computed(() => {
 
 const harmonyPosition = computed(() => harmonies[props.harmony])
 const isMonochromatic = computed(() => props.harmony === 'monochromatic')
+const lightness = computed(() => {
+  return showBrightness.value ? brightness.value : 1
+})
 const rgb = computed(() => {
   const {
     r: red,
@@ -225,7 +230,7 @@ const harmonyPairs = computed(() => {
 
   const hue = rad2deg(phi)
   const saturation = r / radius.value
-  const value = brightness.value
+  const value = lightness.value
   const rgbColor = hsv2rgb(hue, saturation, value)
   const currentColor = {
     x,
@@ -375,7 +380,7 @@ const makeHandleDraggable = () => {
         r: red,
         g: green,
         b: blue
-      } = xy2rgb(pos.x, pos.y, radius.value, brightness.value)
+      } = xy2rgb(pos.x, pos.y, radius.value, lightness.value)
       // brightness.value = 1
       emit('update:color', colord({ r: red, g: green, b: blue }).toHex())
       // target!.style.transform = transform

@@ -129,11 +129,11 @@
             @change="handleChangeColors"
           />
         </div>
-        <div class="w-full flex flex-col overflow-hidden">
+        <div class="w-full flex flex-col p-8 overflow-hidden">
           <div
             v-for="(color, i) in colorList"
             :key="i"
-            class="w-full h-full flex flex-col justify-end p-4 text-xl first-rounded-tr-lg last-rounded-br-lg"
+            class="w-full h-full flex flex-col justify-end p-4 text-xl first-rounded-tr-lg first-rounded-tl-lg last-rounded-bl-lg last-rounded-br-lg"
             :class="isColorReadable ? 'text-neutral-900' : 'text-neutral-100'"
             :style="{
               backgroundColor: `${color}`
