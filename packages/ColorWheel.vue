@@ -31,7 +31,6 @@
         height: `${radius * 2 + 48}px`,
         top: '-24px',
         left: '-24px',
-        transform: `rotate(90deg)`,
         background: `${ringLinearGradient}`
       }"
       role="slider"
@@ -196,7 +195,7 @@ const handleRef = ref<HTMLDivElement | null>(null)
 const position = ref(
   hsv2xy(defaultHsv.hue, defaultHsv.saturation, defaultHsv.value, radius.value)
 )
-const brightness = ref(1)
+const brightness = ref(0.8)
 const ringLinearGradient = computed(() => {
   const tintColorList = colord(defaultColor.value)
     .tints(11)
@@ -215,14 +214,6 @@ const rgb = computed(() => {
     g: green,
     b: blue
   } = xy2rgb(position.value.x, position.value.y, radius.value)
-  return `rgb(${red}, ${green}, ${blue})`
-})
-const rgba = computed(() => {
-  const {
-    r: red,
-    g: green,
-    b: blue
-  } = xy2rgb(position.value.x, position.value.y, radius.value, brightness.value)
   return `rgb(${red}, ${green}, ${blue})`
 })
 
@@ -385,15 +376,18 @@ const makeHandleDraggable = () => {
         g: green,
         b: blue
       } = xy2rgb(pos.x, pos.y, radius.value, brightness.value)
+      // brightness.value = 1
       emit('update:color', colord({ r: red, g: green, b: blue }).toHex())
       // target!.style.transform = transform
     })
 }
 
 const makeRingHandleDraggble = () => {
-  const rotationOffset = -180
+  // const rotationOffset = -180
+  const rotationOffset = -90
   const RAD2DEG = 180 / Math.PI
-  gsap.set('#ringTrackerRef', { transformOrigin: 'center center' })
+  gsap.set('#ringTrackerRef', { transformOrigin: 'center center', rotate: 30 })
+  // gsap.set('#ringTrackerRef', { rotation: 90 })
   const draggable = Draggable.create('#ringTrackerRef', {
     // trigger: '#ringHandleRef',
     type: 'rotation',
@@ -422,7 +416,7 @@ const makeRingHandleDraggble = () => {
         rotation -= 360
       }
       if (rotation) {
-        // console.log(this.rotation)
+        // console.log(rotation)
         const angle = Math.abs(rotation) % 360
         const value = Math.abs(180 - angle) / 180
         brightness.value = value
@@ -433,6 +427,15 @@ const makeRingHandleDraggble = () => {
     onDrag: function () {
       if (this.rotation) {
         // console.log(this.rotation)
+        // const angle = Math.abs(this.rotation) % 360
+        // const quarterValue = angle % 90
+        // let value = 1
+        // if (angle === 90) value = 0
+        // if (angle === 180) value = 1
+        // if (angle === 270) value = 1
+        // if (angle === 0 || angle === 360) value = 0
+        // value = Math.abs(90 - quarterValue) / 90
+        // console.log(value)
         const angle = Math.abs(this.rotation) % 360
         const value = Math.abs(180 - angle) / 180
         brightness.value = value
@@ -440,8 +443,7 @@ const makeRingHandleDraggble = () => {
       }
     }
   })[0]
-
-  console.log(draggable)
+  // console.log(draggable)
 }
 
 watchDebounced(

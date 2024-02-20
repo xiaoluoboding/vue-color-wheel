@@ -13,7 +13,10 @@
     />
     <div class="container mx-auto max-w-5xl relative">
       <nav class="h-20 py-4 flex-between text-primary">
-        <div class="font-semibold text-xl font-serif flex-center gap-2">
+        <div
+          class="font-semibold text-xl font-serif flex-center gap-2"
+          :class="isColorReadable ? 'text-neutral-900' : 'text-neutral-100'"
+        >
           <Logo class="h-6 w-6" />
           Vue Color Wheel
         </div>
@@ -35,14 +38,22 @@
       </nav>
       <header class="py-16 flex flex-col gap-4">
         <div class="font-extrabold space-y-4">
-          <span class="text-6xl text-primary font-serif">Vue Color Wheel</span>
-          <div class="text-4xl text-primary font-sans">
+          <span
+            class="text-6xl font-serif"
+            :class="isColorReadable ? 'text-neutral-900' : 'text-neutral-100'"
+            >Vue Color Wheel</span
+          >
+          <div
+            class="text-4xl font-sans"
+            :class="isColorReadable ? 'text-neutral-900' : 'text-neutral-100'"
+          >
             Create a color palette and effortlessly incorporate it into your
             projects.
           </div>
         </div>
         <div
-          class="text-2xl font-500 text-neutral-800 py-4 dark:text-neutral-200 font-sans"
+          class="text-2xl font-500 py-4 font-sans"
+          :class="isColorReadable ? 'text-neutral-800' : 'text-neutral-200'"
         >
           A Color Wheel Picker for Vue
         </div>
@@ -123,6 +134,7 @@
             v-for="(color, i) in colorList"
             :key="i"
             class="w-full h-full flex flex-col justify-end p-4 text-xl first-rounded-tr-lg last-rounded-br-lg"
+            :class="isColorReadable ? 'text-neutral-900' : 'text-neutral-100'"
             :style="{
               backgroundColor: `${color}`
             }"
@@ -133,46 +145,35 @@
       </main>
 
       <footer
-        class="py-16 w-full flex-center text-primary"
-        text="neutral-900 dark:neutral-300 opacity-60 sm"
+        class="py-16 w-full flex-center text-sm"
+        :class="isColorReadable ? 'text-neutral-900' : 'text-neutral-100'"
       >
         <div class="copyright flex flex-col justify-center items-center">
           <p>
             Code with ❤ & ☕️ by
-            <a class="text-primary" href="https://github.com/xiaoluoboding">
-              @xiaoluoboding
-            </a>
+            <a href="https://github.com/xiaoluoboding"> @xiaoluoboding </a>
             <span> © {{ new Date().getFullYear() }}</span>
           </p>
           <p class="flex items-center space-x-1">
-            <carbon:logo-twitter class="text-primary" />
+            <carbon:logo-twitter />
             <span>
-              <a
-                href="https://twitter.com/xiaoluoboding"
-                class="text-primary"
-                target="_blank"
-              >
+              <a href="https://twitter.com/xiaoluoboding" target="_blank">
                 Follow me on Twitter
               </a>
             </span>
-            <span class="px-2 text-emerald-300">|</span>
-            <carbon:cafe class="text-primary" />
+            <span class="px-2">|</span>
+            <carbon:cafe />
             <span>
-              <a
-                href="https://www.buymeacoffee.com/xlbd"
-                target="_blank"
-                class="text-primary"
-              >
+              <a href="https://www.buymeacoffee.com/xlbd" target="_blank">
                 Buy me a coffee
               </a>
             </span>
-            <span class="px-2 text-emerald-300">|</span>
-            <mdi:heart class="text-primary" />
+            <span class="px-2">|</span>
+            <mdi:heart />
             <span>
               <a
                 href="https://github.com/sponsors/xiaoluoboding"
                 target="_blank"
-                class="text-primary"
               >
                 Sponsor me on GitHub
               </a>
@@ -189,18 +190,22 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useDebounce } from '@vueuse/core'
-import { colord } from 'colord'
+import { colord, extend } from 'colord'
+import a11yPlugin from 'colord/plugins/a11y'
 import { gsap } from 'gsap'
 import { Gradient } from './plugins/GradientMesh.js'
 import { VueColorWheel } from '@/index'
 import type { HarmonyType, Harmony } from '@/index'
 // import { isDark, toggleDarkmode } from '~/composables/useDarkmode'
 
+extend([a11yPlugin])
+
 const gradient = computed(() => new Gradient())
 
 const wheelColor = useDebounce(ref('#40ffff')) // { hue: 0, saturation: 0.68, value: 1 }
 const colors = ref<Harmony[]>([])
 const currentType = ref<HarmonyType>('analogous')
+const isColorReadable = ref(false)
 
 const harmonyTypes: { type: HarmonyType; label: string }[] = [
   { type: 'monochromatic', label: 'Monochromatic' },
@@ -236,11 +241,15 @@ const handleChangeGradient = (harmonyColors: Harmony[]) => {
       root.style.setProperty(`--gradient-color-${Number(index) + 2}`, wave)
     }
 
-    /* @ts-ignore */
-    gradient.value.disconnect()
-    /* @ts-ignore */
-    gradient.value.initGradient('#gradient-canvas')
+    if (import.meta.env.PROD) {
+      /* @ts-ignore */
+      gradient.value.disconnect()
+      /* @ts-ignore */
+      gradient.value.initGradient('#gradient-canvas')
+    }
   }
+
+  isColorReadable.value = colord(base).isReadable('#000', { level: 'AAA' })
 }
 
 const handleChangeColors = (harmonyColors: Harmony[]) => {
@@ -256,6 +265,31 @@ watch(
     immediate: true
   }
 )
+
+// onMounted(() => {
+//   console.log(colord('#40ffff').toHsv())
+//   console.log(
+//     colord({
+//       h: 180,
+//       s: 75,
+//       v: 100
+//     }).toRgb()
+//   )
+//   console.log(
+//     colord({
+//       h: 180,
+//       s: 75,
+//       v: 50
+//     }).toRgb()
+//   )
+//   console.log(
+//     colord({
+//       h: 180,
+//       s: 75,
+//       v: 3
+//     }).toRgb()
+//   )
+// })
 </script>
 
 <style lang="scss">

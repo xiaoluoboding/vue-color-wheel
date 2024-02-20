@@ -1,4 +1,7 @@
-import { colord } from 'colord'
+import { colord, extend } from 'colord'
+import mixPlugin from 'colord/plugins/mix'
+
+extend([mixPlugin])
 
 export const harmonies = {
   complementary: [180],
@@ -37,45 +40,15 @@ export const deg2rad = (hue: number) => {
 // saturation, value in range [0,1]
 // return [r,g,b] each in range [0,255]
 // See: https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSV
-export const hsv2rgb = (
-  hue: number,
-  saturation: number,
-  value: number
-): { r: number; g: number; b: number } => {
-  let chroma = value * saturation
-  let hue1 = hue / 60
-  let x = chroma * (1 - Math.abs((hue1 % 2) - 1))
-  let r1: number = 0,
-    g1: number = 0,
-    b1: number = 0
-  if (hue1 >= 0 && hue1 <= 1) {
-    ;[r1, g1, b1] = [chroma, x, 0]
-  } else if (hue1 >= 1 && hue1 <= 2) {
-    ;[r1, g1, b1] = [x, chroma, 0]
-  } else if (hue1 >= 2 && hue1 <= 3) {
-    ;[r1, g1, b1] = [0, chroma, x]
-  } else if (hue1 >= 3 && hue1 <= 4) {
-    ;[r1, g1, b1] = [0, x, chroma]
-  } else if (hue1 >= 4 && hue1 <= 5) {
-    ;[r1, g1, b1] = [x, 0, chroma]
-  } else if (hue1 >= 5 && hue1 <= 6) {
-    ;[r1, g1, b1] = [chroma, 0, x]
+export const hsv2rgb = (hue: number, saturation: number, value: number) => {
+  const hsv = {
+    h: hue,
+    s: saturation * 100,
+    v: value * 100
   }
 
-  let m = value - chroma
-  let [r, g, b] = [r1 + m, g1 + m, b1 + m]
-
-  // Change r,g,b values from [0,1] to [0,255]
-  // return {
-  //   r: Math.round(r * 255),
-  //   g: Math.round(g * 255),
-  //   b: Math.round(b * 255)
-  // }
-  return {
-    r: r * 255,
-    g: g * 255,
-    b: b * 255
-  }
+  return colord(hsv).mix('#ffffff', value).toRgb()
+  // return colord(hsv).toRgb()
 }
 
 export const hex2hsv = (color: string) => {
@@ -99,10 +72,16 @@ export const xy2rgb = (
   const [r, phi] = xy2polar(x, y)
 
   const hue = rad2deg(phi)
-  const saturation = r / radius
-  const value = brightness
+  const saturation = (r / radius) * 100
+  const value = brightness * 100
 
-  return hsv2rgb(hue, saturation, value)
+  const hsv = {
+    h: hue,
+    s: saturation,
+    v: value
+  }
+
+  return colord(hsv).toRgb()
 }
 
 export const hsv2xy = (
