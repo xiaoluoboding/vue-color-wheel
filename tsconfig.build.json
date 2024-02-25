@@ -6,7 +6,8 @@
     "emitDeclarationOnly": true,
     "outDir": "lib",
     "moduleResolution": "Node",
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "types": ["web-bluetooth", "node"]
   },
   "vueCompilerOptions": {
     "skipTemplateCodegen": true

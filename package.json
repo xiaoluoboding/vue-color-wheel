@@ -33,10 +33,10 @@
   "devDependencies": {
     "@iconify/json": "^2.2.177",
     "@types/node": "^18.19.14",
+    "@types/web-bluetooth": "^0.0.20",
     "@unocss/reset": "^0.55.7",
     "@vitejs/plugin-vue": "^4.6.2",
-    "@vueuse/components": "^10.7.2",
-    "@vueuse/core": "^10.7.2",
+    "@vueuse/core": "9.13.0",
     "clean-css": "^5.3.3",
     "highlight.js": "^11.9.0",
     "sass": "^1.70.0",
