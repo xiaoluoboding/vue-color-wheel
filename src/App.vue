@@ -129,17 +129,29 @@
             @change="handleChangeColors"
           />
         </div>
-        <div class="w-full flex flex-col p-8 overflow-hidden">
-          <div
-            v-for="(color, i) in colorList"
-            :key="i"
-            class="w-full h-full flex flex-col justify-end p-4 text-xl first-rounded-tr-lg first-rounded-tl-lg last-rounded-bl-lg last-rounded-br-lg"
-            :class="isColorReadable ? 'text-neutral-900' : 'text-neutral-100'"
-            :style="{
-              backgroundColor: `${color}`
-            }"
-          >
-            {{ color }}
+        <div class="w-full flex flex-col p-8 overflow-hidden cursor-copy">
+          <div class="flex flex-col h-full">
+            <div
+              v-for="(color, i) in colorList"
+              :key="i"
+              class="w-full h-full flex flex-col justify-end p-4 text-xl first-rounded-tr-lg first-rounded-tl-lg last-rounded-bl-lg last-rounded-br-lg"
+              :class="isColorReadable ? 'text-neutral-900' : 'text-neutral-100'"
+              :style="{
+                backgroundColor: `${color}`
+              }"
+              @click="() => handleCopy(color)"
+            >
+              {{ color }}
+            </div>
+            <div class="flex justify-end gap-2 mt-2">
+              <button
+                class="bg-transparent text-primary border-1 py-2 px-6 focus:outline-none rounded-md text-sm w-45"
+                hover="bg-neutral-50/50"
+                @click="() => handleCopy(colorList.join(','))"
+              >
+                Copy
+              </button>
+            </div>
           </div>
         </div>
       </main>
@@ -185,14 +197,17 @@
       <div class="w-full mx-auto"></div>
     </div>
   </div>
+  <Toaster position="top-center" />
 </template>
 
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { useDebounce } from '@vueuse/core'
+import { useDebounce, useClipboard } from '@vueuse/core'
 import { colord, extend } from 'colord'
 import a11yPlugin from 'colord/plugins/a11y'
 import { gsap } from 'gsap'
+import { Toaster, toast } from 'vue-sonner'
+
 import { Gradient } from './plugins/GradientMesh.js'
 import { VueColorWheel } from '@/index'
 import type { HarmonyType, Harmony } from '@/index'
@@ -226,6 +241,13 @@ const colorList = computed(() => {
 const bgColor = computed(() => {
   return `linear-gradient(${colorList.value.join(',')})`
 })
+
+const { copy } = useClipboard()
+
+const handleCopy = (str: string) => {
+  copy(str)
+  toast.success('Copied to clipboard!')
+}
 
 const handleChangeGradient = (harmonyColors: Harmony[]) => {
   const newColors = harmonyColors.map((color, i) => colord(color.rgb).toHex())

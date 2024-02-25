@@ -51,6 +51,7 @@
   "dependencies": {
     "colord": "^2.9.3",
     "gsap": "^3.12.5",
-    "moveable": "^0.53.0"
+    "moveable": "^0.53.0",
+    "vue-sonner": "^1.0.3"
   }
 }

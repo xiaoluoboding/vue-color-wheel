@@ -11,7 +11,7 @@
 [bundlePhobiaBadge]: https://img.shields.io/bundlephobia/minzip/vue-color-wheel
 [bundlePhobiaUrl]: https://bundlephobia.com/package/vue-color-wheel@latest
 
-> A minimal Vue Color Wheel, built on top of Vite & Vue 3
+> A Color Wheel Picker for Vue, built on top of Vite & Vue 3
 
 ## Table of Contents
 
@@ -21,62 +21,85 @@
 
 - [Vue Color Wheel](#vue-color-wheel)
   - [Table of Contents](#table-of-contents)
-  - [Features](#features)
-  - [Use the Template](#use-the-template)
-    - [GitHub Template](#github-template)
-    - [Clone to local](#clone-to-local)
+  - [Concept](#concept)
   - [Usage](#usage)
-    - [1、Install dependencies](#1install-dependencies)
-    - [2、Build a library](#2build-a-library)
-    - [3、Publish to npm](#3publish-to-npm)
+    - [Install](#install)
+    - [Add to Project](#add-to-project)
+  - [Color combinations](#color-combinations)
+    - [Complementary](#complementary)
+    - [Monochromatic](#monochromatic)
+    - [Analogous](#analogous)
+    - [Triadic](#triadic)
+  - [Tetradic (Square)](#tetradic-square)
   - [License](#license)
 
 </details>
 
-## Features
+## Concept
 
-- Package manager [pnpm](https://pnpm.js.org/), safe and fast
-- Bundle with the [library mode](https://vitejs.dev/guide/build.html#library-mode)
-- Release with [semantic-release](https://www.npmjs.com/package/semantic-release)
-- Publish to [npm](https://docs.npmjs.com/cli/v8/commands/npm-publish)
+Why using color wheel picker? Color Wheel makes color combinations easy.
 
-## Use the Template
-
-### GitHub Template
-
-[create a repo from this template on GitHub](https://github.com/new?template_name=vue-color-wheel&template_owner=xiaoluoboding)
-
-### Clone to local
-
-```bash
-git clone https://github.com/xiaoluoboding/vue-color-wheel
-
-cd vue-color-wheel
-```
+A color wheel picker is a helpful tool for selecting colors by visually showing relationships between different colors, aiding in choosing `harmonious color` schemes for designs. It allows adjusting parameters like hue, saturation, and brightness for more control over color selection, streamlining the process for creating visually appealing designs.
 
 ## Usage
 
-Building it is as easy as 1, 2, 3.
-
-### 1、Install dependencies
+### Install
 
 ```bash
-pnpm install
+> pnpm i vue-color-wheel
 ```
 
-### 2、Build a library
+### Add to Project
 
-Rename all the `vue-color-wheel` to your component name in the file `package.json、vite.config.ts`, eg: `my-component`
+```vue
+<template>
+  ...
+  <VueColorWheel
+    wheel="aurora"
+    harmony="analogous"
+    :radius="160"
+    :defaultColor="wheelColor"
+    v-model:color="wheelColor"
+    @change="handleChangeColors"
+  />
+  ...
+</template>
 
-```bash
-pnpm run build:lib
+<script lang="ts" setup>
+import type { Harmony } from 'vue-color-wheel'
+import { VueColorWheel } from 'vue-color-wheel'
+import { useDebounce } from '@vueuse/core'
+
+const wheelColor = useDebounce(ref('#40ffff'))
+const colorList = ref<Harmony[]>()
+
+const handleChangeColors = (harmonyColors: Harmony[]) => {
+  colorList.value = harmonyColors
+}
+</script>
 ```
 
-### 3、Publish to npm
+## Color combinations
 
-```
-npm publish
-```
+### Complementary
+
+Two colors that are on opposite sides of the color wheel. This combination provides a high contrast and high impact color combination – together, these colors will appear brighter and more prominent.
+
+### Monochromatic
+
+Three shades, tones and tints of one base color. Provides a subtle and conservative color combination. This is a versatile color combination that is easy to apply to design projects for a harmonious look.
+
+### Analogous
+
+Three colors that are side by side on the color wheel. This color combination is versatile, but can be overwhelming. To balance an analogous color scheme, choose one dominant color, and use the others as accents.
+
+### Triadic
+
+Three colors that are evenly spaced on the color wheel. This provides a high contrast color scheme, but less so than the complementary color combination — making it more versatile. This combination creates bold, vibrant color palettes.
+
+## Tetradic (Square)
+
+Four colors that are evenly spaced on the color wheel. Tetradic color schemes are bold and work best if you let one color be dominant, and use the others as accents. The more colors you have in your palette, the more difficult it is to balance.
 
 ## License
 
