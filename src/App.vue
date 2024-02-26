@@ -55,7 +55,17 @@
           class="text-2xl font-500 py-4 font-sans"
           :class="isColorReadable ? 'text-neutral-800' : 'text-neutral-200'"
         >
-          A Color Wheel Picker for Vue
+          A Color Wheel Picker for Vue, craft by
+          <a
+            href="https://twitter.com/robert_shaw_x"
+            target="_blank"
+            :class="
+              isColorReadable
+                ? 'hover:text-neutral-900/80'
+                : 'hover:text-neutral-100/80'
+            "
+            >@robert_shaw_x</a
+          >
         </div>
         <!-- <div class="flex gap-4 mt-8">
           <a
@@ -169,7 +179,7 @@
           <p class="flex items-center space-x-1">
             <carbon:logo-twitter />
             <span>
-              <a href="https://twitter.com/xiaoluoboding" target="_blank">
+              <a href="https://twitter.com/robert_shaw_x" target="_blank">
                 Follow me on Twitter
               </a>
             </span>
