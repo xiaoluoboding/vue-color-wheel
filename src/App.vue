@@ -2,15 +2,13 @@
   <div
     class="w-full h-full min-h-screen bg-neutral-50 dark:bg-neutral-900"
     id="app-wrapper"
-    :style="{
-      background: `${bgColor}`
-    }"
+    ref="wrapperRef"
   >
-    <canvas
+    <!-- <canvas
       class="fixed z-0 w-full h-full"
       data-transition-in
       id="gradient-canvas"
-    />
+    /> -->
     <div class="container mx-auto max-w-5xl relative">
       <nav class="h-20 py-4 flex-between text-primary">
         <div
@@ -135,6 +133,7 @@
             :harmony="currentType"
             :radius="160"
             :defaultColor="wheelColor"
+            :show-brightness="false"
             v-model:color="wheelColor"
             @change="handleChangeColors"
           />
@@ -218,19 +217,20 @@ import a11yPlugin from 'colord/plugins/a11y'
 import { gsap } from 'gsap'
 import { Toaster, toast } from 'vue-sonner'
 
-import { Gradient } from './plugins/GradientMesh.js'
+// import { Gradient } from './plugins/GradientMesh.js'
 import { VueColorWheel } from '@/index'
 import type { HarmonyType, Harmony } from '@/index'
 // import { isDark, toggleDarkmode } from '~/composables/useDarkmode'
 
 extend([a11yPlugin])
 
-const gradient = computed(() => new Gradient())
+// const gradient = computed(() => new Gradient())
 
 const wheelColor = useDebounce(ref('#40ffff')) // { hue: 0, saturation: 0.68, value: 1 }
 const colors = ref<Harmony[]>([])
 const currentType = ref<HarmonyType>('analogous')
 const isColorReadable = ref(false)
+const wrapperRef = ref(null)
 
 const harmonyTypes: { type: HarmonyType; label: string }[] = [
   { type: 'monochromatic', label: 'Monochromatic' },
@@ -262,24 +262,52 @@ const handleCopy = (str: string) => {
 const handleChangeGradient = (harmonyColors: Harmony[]) => {
   const newColors = harmonyColors.map((color, i) => colord(color.rgb).toHex())
 
-  const [base, ...waves] = newColors
+  const [base, secondary, tertiary] = newColors
 
-  if (gradient.value) {
-    const root = document.documentElement
-    root.style.setProperty('--gradient-color-1', base)
-    root.style.setProperty('--gradient-color-4', base)
+  const b1 = `
+    linear-gradient(135deg, ${base}, rgba(255,0,0,0) 60%),
+    linear-gradient(225deg, ${secondary}, rgba(0,255,0,0) 60%),
+    linear-gradient(315deg, ${tertiary}, rgba(0,0,255,0) 60%)`
 
-    for (const [index, wave] of Object.entries(waves)) {
-      root.style.setProperty(`--gradient-color-${Number(index) + 2}`, wave)
-    }
+  const bg1 = newColors
+    .map((item, index) => {
+      return `linear-gradient(${45 * (index + 1)}deg, ${item}, rgba(${
+        index === 0 ? 255 : 0
+      }, ${index === 1 ? 255 : 0}, ${(index + 1) % 3 === 0 ? 255 : 0},0) 80%)`
+    })
+    .join(',')
 
-    if (import.meta.env.PROD) {
-      /* @ts-ignore */
-      gradient.value.disconnect()
-      /* @ts-ignore */
-      gradient.value.initGradient('#gradient-canvas')
-    }
-  }
+  const bg2 = newColors
+    .reverse()
+    .map((item, index) => {
+      return `linear-gradient(${70 * (index + 1)}deg, ${item}, rgba(${
+        index === 0 ? 255 : 0
+      }, ${index === 1 ? 255 : 0}, ${(index + 1) % 3 === 0 ? 255 : 0},0) 75%)`
+    })
+    .join(',')
+
+  gsap.fromTo(
+    '#app-wrapper',
+    { background: bg1 },
+    { ease: 'none', duration: 5, background: bg2, repeat: -1, yoyo: true }
+  )
+
+  // if (gradient.value) {
+  //   const root = document.documentElement
+  //   root.style.setProperty('--gradient-color-1', base)
+  //   root.style.setProperty('--gradient-color-4', base)
+
+  //   for (const [index, wave] of Object.entries(waves)) {
+  //     root.style.setProperty(`--gradient-color-${Number(index) + 2}`, wave)
+  //   }
+
+  //   if (import.meta.env.PROD) {
+  //     /* @ts-ignore */
+  //     gradient.value.disconnect()
+  //     /* @ts-ignore */
+  //     gradient.value.initGradient('#gradient-canvas')
+  //   }
+  // }
 
   isColorReadable.value = colord(base).isReadable('#000', { level: 'AAA' })
 }
