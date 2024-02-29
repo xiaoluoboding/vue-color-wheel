@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-full h-full min-h-screen bg-neutral-50 dark:bg-neutral-900"
+    class="w-full h-full min-h-screen bg-neutral-50 dark:bg-neutral-900 px-4 lg:px-0"
     id="app-wrapper"
     ref="wrapperRef"
   >
@@ -84,9 +84,9 @@
       </header>
 
       <main
-        class="grid grid-cols-4 gap-8 text-xs 2xl:text-sm bg-white rounded-2xl shadow-md"
+        class="grid grid-cols-1 lg:grid-cols-4 gap-8 text-xs 2xl:text-sm bg-white rounded-2xl shadow-md"
       >
-        <div class="w-full flex items-center p-8">
+        <div class="w-full p-8 order-1">
           <div class="flex flex-col gap-8">
             <fieldset class="flex flex-col gap-4">
               <figcaption class="text-xl">Pick a color</figcaption>
@@ -94,7 +94,7 @@
                 <div class="flex relative">
                   <input
                     id="color-input"
-                    class="bg-transparent text-base py-2 pl-2 pr-6 border rounded-md w-45"
+                    class="bg-transparent text-base py-2 pl-2 pr-6 border rounded-md w-full lg:w-45"
                     v-model="wheelColor"
                   />
                   <div
@@ -107,27 +107,25 @@
             <fieldset class="flex flex-col gap-4">
               <figcaption class="text-xl">Pick a palette type</figcaption>
               <figure>
-                <div class="flex items-center gap-3">
-                  <div class="relative flex flex-col gap-2">
-                    <button
-                      v-for="v in harmonyTypes"
-                      :key="v.type"
-                      :value="v.type"
-                      @click.prevent="currentType = v.type"
-                      class="text-primary border-1 py-2 px-6 focus:outline-none rounded-md text-sm w-45"
-                      :class="{
-                        'bg-neutral-950 text-white': currentType === v.type
-                      }"
-                    >
-                      {{ v.label }}
-                    </button>
-                  </div>
+                <div class="relative flex flex-col gap-2">
+                  <button
+                    v-for="v in harmonyTypes"
+                    :key="v.type"
+                    :value="v.type"
+                    @click.prevent="currentType = v.type"
+                    class="text-primary border-1 py-2 px-6 focus:outline-none rounded-md text-sm w-full lg:w-45"
+                    :class="{
+                      'bg-neutral-950 text-white': currentType === v.type
+                    }"
+                  >
+                    {{ v.label }}
+                  </button>
                 </div>
               </figure>
             </fieldset>
           </div>
         </div>
-        <div class="col-span-2 flex-center">
+        <div class="lg:col-span-2 flex-center order-2 lg:p-0">
           <VueColorWheel
             wheel="aurora"
             :harmony="currentType"
@@ -138,7 +136,9 @@
             @change="handleChangeColors"
           />
         </div>
-        <div class="w-full flex flex-col p-8 overflow-hidden cursor-copy">
+        <div
+          class="w-full flex flex-col p-8 overflow-hidden cursor-copy order-3"
+        >
           <div class="flex flex-col h-full">
             <div
               v-for="(color, i) in colorList"
@@ -152,15 +152,16 @@
             >
               {{ color }}
             </div>
-            <div class="flex justify-end gap-2 mt-2">
-              <button
-                class="bg-transparent text-primary border-1 py-2 px-6 focus:outline-none rounded-md text-sm w-45"
-                hover="bg-neutral-50/50"
-                @click="() => handleCopy(colorList.join(','))"
-              >
-                Copy
-              </button>
-            </div>
+          </div>
+
+          <div class="w-full lg:flex lg:justify-end gap-2 mt-2">
+            <button
+              class="bg-transparent text-primary border-1 py-2 px-6 focus:outline-none rounded-md text-sm w-full lg:w-45"
+              hover="bg-neutral-50/50"
+              @click="() => handleCopy(colorList.join(','))"
+            >
+              Copy
+            </button>
           </div>
         </div>
       </main>
@@ -175,7 +176,7 @@
             <a href="https://github.com/xiaoluoboding"> @xiaoluoboding </a>
             <span> © {{ new Date().getFullYear() }}</span>
           </p>
-          <p class="flex items-center space-x-1">
+          <p class="flex items-center space-x-1 flex-col lg:flex-row">
             <carbon:logo-twitter />
             <span>
               <a href="https://twitter.com/robert_shaw_x" target="_blank">
