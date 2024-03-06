@@ -265,25 +265,24 @@ const handleChangeGradient = (harmonyColors: Harmony[]) => {
 
   const [base, secondary, tertiary] = newColors
 
-  const b1 = `
-    linear-gradient(135deg, ${base}, rgba(255,0,0,0) 60%),
-    linear-gradient(225deg, ${secondary}, rgba(0,255,0,0) 60%),
-    linear-gradient(315deg, ${tertiary}, rgba(0,0,255,0) 60%)`
-
   const bg1 = newColors
     .map((item, index) => {
-      return `linear-gradient(${45 * (index + 1)}deg, ${item}, rgba(${
-        index === 0 ? 255 : 0
-      }, ${index === 1 ? 255 : 0}, ${(index + 1) % 3 === 0 ? 255 : 0},0) 80%)`
+      return `linear-gradient(${
+        45 * (index + 1)
+      }deg var(--space), ${item}, rgba(${index === 0 ? 255 : 0}, ${
+        index === 1 ? 255 : 0
+      }, ${(index + 1) % 3 === 0 ? 255 : 0},0) 80%)`
     })
     .join(',')
 
   const bg2 = newColors
     .reverse()
     .map((item, index) => {
-      return `linear-gradient(${70 * (index + 1)}deg, ${item}, rgba(${
-        index === 0 ? 255 : 0
-      }, ${index === 1 ? 255 : 0}, ${(index + 1) % 3 === 0 ? 255 : 0},0) 75%)`
+      return `linear-gradient(${
+        70 * (index + 1)
+      }deg var(--space), ${item}, rgba(${index === 0 ? 255 : 0}, ${
+        index === 1 ? 255 : 0
+      }, ${(index + 1) % 3 === 0 ? 255 : 0},0) 75%)`
     })
     .join(',')
 
@@ -326,33 +325,14 @@ watch(
     immediate: true
   }
 )
-
-// onMounted(() => {
-//   console.log(colord('#40ffff').toHsv())
-//   console.log(
-//     colord({
-//       h: 180,
-//       s: 75,
-//       v: 100
-//     }).toRgb()
-//   )
-//   console.log(
-//     colord({
-//       h: 180,
-//       s: 75,
-//       v: 50
-//     }).toRgb()
-//   )
-//   console.log(
-//     colord({
-//       h: 180,
-//       s: 75,
-//       v: 3
-//     }).toRgb()
-//   )
-// })
 </script>
 
 <style lang="scss">
+:root {
+  --space: ;
+  @supports (background: linear-gradient(in oklab, #000, #fff)) {
+    --space: in oklab;
+  }
+}
 @import '~/assets/highlight.scss';
 </style>
