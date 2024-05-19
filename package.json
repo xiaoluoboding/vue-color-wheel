@@ -5,7 +5,7 @@
   "type": "module",
   "author": "xiaoluoboding <xiaoluoboding@gmail.com>",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 2423",
     "build:docs": "vite build --mode docs",
     "build:lib": "vite build --mode lib && vue-tsc -p tsconfig.build.json",
     "preview": "vite preview",
