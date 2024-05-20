@@ -151,7 +151,7 @@ watch(
     position: absolute;
     background: radial-gradient(
         circle at center,
-        rgba(var(--color2), 0.8) 0,
+        rgba(var(--color2), 0.6) 0,
         rgba(var(--color2), 0) 50%
       )
       no-repeat;
@@ -172,7 +172,7 @@ watch(
     position: absolute;
     background: radial-gradient(
         circle at center,
-        rgba(var(--color3), 0.8) 0,
+        rgba(var(--color3), 0.6) 0,
         rgba(var(--color3), 0) 50%
       )
       no-repeat;
@@ -193,7 +193,7 @@ watch(
     position: absolute;
     background: radial-gradient(
         circle at center,
-        rgba(var(--color4), 0.8) 0,
+        rgba(var(--color4), 0.6) 0,
         rgba(var(--color4), 0) 50%
       )
       no-repeat;
@@ -214,7 +214,7 @@ watch(
     position: absolute;
     background: radial-gradient(
         circle at center,
-        rgba(var(--color5), 0.8) 0,
+        rgba(var(--color5), 0.6) 0,
         rgba(var(--color5), 0) 50%
       )
       no-repeat;

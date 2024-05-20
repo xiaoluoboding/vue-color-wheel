@@ -4,7 +4,7 @@
     id="app-wrapper"
     ref="wrapperRef"
   >
-    <GradientAnimation />
+    <GradientAnimation class="bg-white dark:bg-neutral-900 h-[150vh]" />
     <div class="container mx-auto max-w-5xl relative">
       <nav class="h-20 py-4 flex-between text-primary">
         <div
@@ -15,6 +15,13 @@
           Vue Color Wheel
         </div>
         <div class="flex-center gap-4">
+          <button
+            class="!bg-transparent opacity-50 hover:opacity-100 transition"
+            @click="(e) => toggleDarkmode()"
+          >
+            <carbon:moon class="w-6 h-6" v-if="isDark" />
+            <carbon:sun class="w-6 h-6" v-else />
+          </button>
           <a
             class="opacity-50 hover:opacity-100 transition"
             href="https://github.com/xiaoluoboding/vue-color-wheel"
@@ -42,7 +49,7 @@
           class="text-2xl font-500 py-4 font-sans"
           :class="isColorReadable ? 'text-neutral-800' : 'text-neutral-200'"
         >
-          A Color Wheel Picker for Vue, craft by
+          A Color Wheel Picker Component for Vue, craft by
           <a
             href="https://twitter.com/robert_shaw_x"
             target="_blank"
@@ -74,17 +81,17 @@
       </header>
 
       <main
-        class="grid grid-cols-1 lg:grid-cols-4 gap-8 text-xs 2xl:text-sm bg-white rounded-2xl shadow-md"
+        class="grid grid-cols-1 lg:grid-cols-4 gap-8 text-xs 2xl:text-sm bg-white/48 dark:bg-neutral-800/60 backdrop-blur-md rounded-2xl shadow-md"
       >
         <div class="w-full p-8 order-1">
           <div class="flex flex-col gap-8">
             <fieldset class="flex flex-col gap-4">
-              <figcaption class="text-xl">Pick a color</figcaption>
+              <figcaption class="text-xl text-primary">Pick a color</figcaption>
               <figure>
                 <div class="flex relative">
                   <input
                     id="color-input"
-                    class="bg-transparent text-base py-2 pl-2 pr-6 border rounded-md w-full lg:w-45"
+                    class="bg-transparent text-primary text-base py-2 pl-2 pr-6 border border-neutral-900 dark:border-neutral-100/30 rounded-md w-full lg:w-45"
                     v-model="wheelColor"
                   />
                   <div
@@ -95,7 +102,9 @@
               </figure>
             </fieldset>
             <fieldset class="flex flex-col gap-4">
-              <figcaption class="text-xl">Pick a palette type</figcaption>
+              <figcaption class="text-xl text-primary">
+                Pick a palette type
+              </figcaption>
               <figure>
                 <div class="relative flex flex-col gap-2">
                   <button
@@ -103,9 +112,10 @@
                     :key="v.type"
                     :value="v.type"
                     @click.prevent="currentType = v.type"
-                    class="text-primary border-1 py-2 px-6 focus:outline-none rounded-md text-sm w-full lg:w-45"
+                    class="text-neutral-900 border-1 bg-white dark:bg-white/48 border-neutral-100/30 py-2 px-6 focus:outline-none rounded-md text-sm w-full lg:w-45"
                     :class="{
-                      'bg-neutral-950 text-white': currentType === v.type
+                      '!bg-neutral-800 !dark:bg-neutral-800  text-white':
+                        currentType === v.type
                     }"
                   >
                     {{ v.label }}
@@ -146,7 +156,7 @@
 
           <div class="w-full lg:flex lg:justify-end gap-2 mt-2">
             <button
-              class="bg-transparent text-primary border-1 py-2 px-6 focus:outline-none rounded-md text-sm w-full lg:w-45"
+              class="text-white bg-neutral-800 border-1 border-neutral-100/30 py-2 px-6 focus:outline-none rounded-md text-sm w-full lg:w-45"
               hover="bg-neutral-50/50"
               @click="() => handleCopy(colorList.join(','))"
             >
@@ -211,7 +221,7 @@ import { Toaster, toast } from 'vue-sonner'
 import { VueColorWheel } from '@/index'
 import type { HarmonyType, Harmony } from '@/index'
 import GradientAnimation from './components/GradientAnimation.vue'
-// import { isDark, toggleDarkmode } from '~/composables/useDarkmode'
+import { isDark, toggleDarkmode } from '~/composables/useDarkmode'
 
 extend([a11yPlugin])
 
@@ -301,7 +311,10 @@ const handleChangeGradient = (harmonyColors: Harmony[]) => {
   //   { ease: 'none', duration: 5, background: bg2, repeat: -1, yoyo: true }
   // )
 
-  isColorReadable.value = colord(base).isReadable('#000', { level: 'AAA' })
+  isColorReadable.value = colord(base).isReadable(
+    isDark.value ? '#fff' : '#000',
+    { level: 'AAA' }
+  )
 }
 
 const handleChangeColors = (harmonyColors: Harmony[]) => {
