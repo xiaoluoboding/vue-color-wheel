@@ -87,6 +87,8 @@
     />
 
     <div
+      ref="auroraWheelRef"
+      id="auroraWheelRef"
       v-else
       class="aurora-wheel"
       :style="{
@@ -362,29 +364,25 @@ const makeHandleDraggable = () => {
     bounds: { left: 0, top: 0, right: 0, bottom: 0, position: 'css' }
   })
   /* draggable */
-  moveable
-    .on('dragStart', ({ target }) => {
-      // console.log('onDragStart', target)
-    })
-    .on('drag', ({ target, translate, transform }) => {
-      // console.log('onDrag translate', translate)
-      // console.log('onDrag transform', transform)
-      const [dx, dy] = translate
-      let [r, phi] = xy2polar(dx - radius.value, dy - radius.value)
-      // Limit radial distance to radius
-      r = Math.min(r, radius.value)
-      const [x, y] = polar2xy(r, phi)
-      const pos = { x: x + radius.value, y: y + radius.value }
-      position.value = pos
-      const {
-        r: red,
-        g: green,
-        b: blue
-      } = xy2rgb(pos.x, pos.y, radius.value, lightness.value)
-      // brightness.value = 1
-      emit('update:color', colord({ r: red, g: green, b: blue }).toHex())
-      // target!.style.transform = transform
-    })
+  moveable.on('drag', ({ target, translate, transform }) => {
+    // console.log('onDrag translate', translate)
+    // console.log('onDrag transform', transform)
+    const [dx, dy] = translate
+    let [r, phi] = xy2polar(dx - radius.value, dy - radius.value)
+    // Limit radial distance to radius
+    r = Math.min(r, radius.value)
+    const [x, y] = polar2xy(r, phi)
+    const pos = { x: x + radius.value, y: y + radius.value }
+    position.value = pos
+    const {
+      r: red,
+      g: green,
+      b: blue
+    } = xy2rgb(pos.x, pos.y, radius.value, lightness.value)
+    // brightness.value = 1
+    emit('update:color', colord({ r: red, g: green, b: blue }).toHex())
+    // target!.style.transform = transform
+  })
 }
 
 const makeRingHandleDraggble = () => {
@@ -451,6 +449,43 @@ const makeRingHandleDraggble = () => {
   // console.log(draggable)
 }
 
+const makeWheelDraggable = () => {
+  const moveable = new Moveable(document.body, {
+    target: document.getElementById('auroraWheelRef'),
+    container: document.getElementById('ColorWheel'),
+    draggable: true,
+    origin: false,
+    keepRatio: true,
+    // Resize, Scale Events at edges.
+    edge: false,
+    throttleDrag: 0,
+    throttleResize: 0,
+    throttleScale: 0,
+    throttleRotate: 0,
+    bounds: { left: 0, top: 0, right: 0, bottom: 0, position: 'css' }
+  })
+  /* draggable */
+  moveable.on('dragStart', ({ target }) => {
+    let e = event as MouseEvent
+    if (e?.target === target) {
+      const dx = e?.offsetX
+      const dy = e?.offsetY
+      let [r, phi] = xy2polar(dx - radius.value, dy - radius.value)
+      // Limit radial distance to radius
+      r = Math.min(r, radius.value)
+      const [x, y] = polar2xy(r, phi)
+      const pos = { x: x + radius.value, y: y + radius.value }
+      position.value = pos
+      const {
+        r: red,
+        g: green,
+        b: blue
+      } = xy2rgb(pos.x, pos.y, radius.value, lightness.value)
+      emit('update:color', colord({ r: red, g: green, b: blue }).toHex())
+    }
+  })
+}
+
 watchDebounced(
   () => [defaultColor.value, radius.value],
   () => {
@@ -472,6 +507,7 @@ onMounted(() => {
   drawWheel()
   makeHandleDraggable()
   makeRingHandleDraggble()
+  makeWheelDraggable()
 })
 </script>
 
@@ -484,8 +520,17 @@ onMounted(() => {
   outline: none;
   position: relative;
   -webkit-tap-highlight-color: transparent;
-  transform: rotate(270deg);
   cursor: pointer;
+}
+
+.vue-color-wheel .aurora-wheel:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: rotate(270deg);
+  width: 100%;
+  height: 100%;
   border-radius: 100%;
   background: radial-gradient(
       circle at 50% 0,
