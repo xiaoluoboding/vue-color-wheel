@@ -330,6 +330,15 @@ watch(
     immediate: true
   }
 )
+watch(
+  () => isDark.value,
+  () => {
+    handleChangeGradient(colors.value)
+  },
+  {
+    immediate: true
+  }
+)
 </script>
 
 <style lang="scss"></style>
