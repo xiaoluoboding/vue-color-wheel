@@ -1,4 +1,15 @@
-# 0.1.0 (2024-02-25)
+## [0.1.1](https://github.com/xiaoluoboding/vue-color-wheel/compare/v0.1.0...v0.1.1) (2024-05-20)
+
+
+### Features
+
+* add click handle for wheel ([9b6c38e](https://github.com/xiaoluoboding/vue-color-wheel/commit/9b6c38ed1abe2deb933673ca8b44041161e271a4))
+* add og image ([33fd37e](https://github.com/xiaoluoboding/vue-color-wheel/commit/33fd37e57d25e0ff2fc4f7c9d19bf04533a947d7))
+* extract the component ([3aa2cd5](https://github.com/xiaoluoboding/vue-color-wheel/commit/3aa2cd5f58a611b7af96ea10e226669922c78fa0))
+
+
+
+# [0.1.0](https://github.com/xiaoluoboding/vue-color-wheel/compare/e88c856bf6ed72d0b338a903cfaa6060538e6382...v0.1.0) (2024-02-25)
 
 
 ### Bug Fixes
