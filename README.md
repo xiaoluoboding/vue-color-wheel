@@ -30,7 +30,7 @@
     - [Monochromatic](#monochromatic)
     - [Analogous](#analogous)
     - [Triadic](#triadic)
-  - [Tetradic (Square)](#tetradic-square)
+    - [Tetradic (Square)](#tetradic-square)
   - [License](#license)
 
 </details>
@@ -97,7 +97,7 @@ Three colors that are side by side on the color wheel. This color combination is
 
 Three colors that are evenly spaced on the color wheel. This provides a high contrast color scheme, but less so than the complementary color combination — making it more versatile. This combination creates bold, vibrant color palettes.
 
-## Tetradic (Square)
+### Tetradic (Square)
 
 Four colors that are evenly spaced on the color wheel. Tetradic color schemes are bold and work best if you let one color be dominant, and use the others as accents. The more colors you have in your palette, the more difficult it is to balance.
 
