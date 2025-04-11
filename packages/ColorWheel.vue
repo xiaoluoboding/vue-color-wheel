@@ -79,9 +79,12 @@
       ref="canvasRef"
       v-if="wheel === 'spectrum'"
       :style="{
-        width: '100%',
-        height: '100%',
-        borderRadius: '9999px',
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        width: `${radius * 2}px`,
+        height: `${radius * 2}px`,
+        borderRadius: '50%',
         zIndex: '10'
       }"
     />
